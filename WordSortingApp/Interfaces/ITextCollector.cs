@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace WordSortingApp.Interfaces
 {
-    public interface ITextCollectorStrategy
+    public interface ITextCollector
     {
-        public void CollectText(string[] source);
+        public void ReadAndAddToCollection(string[] source);
     }
 }

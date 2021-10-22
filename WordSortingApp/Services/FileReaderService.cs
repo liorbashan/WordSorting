@@ -10,14 +10,14 @@ using WordSortingApp.Interfaces;
 
 namespace WordSortingApp.Services
 {
-    public class FileReaderService : ITextCollectorStrategy
+    public class FileReaderService : ITextCollector
     {
-        public void CollectText(string[] filePaths)
+        public void ReadAndAddToCollection(string[] filePaths)
         {
-            ReadAndProcessFiles(filePaths);
+            ReadFilesFromPath(filePaths);
         }
 
-        private void ReadAndProcessFiles(string[] filePaths)
+        private void ReadFilesFromPath(string[] filePaths)
         {
             // Our thread-safe collection used for the handover.
             var words = new BlockingCollection<string>();
@@ -27,24 +27,28 @@ namespace WordSortingApp.Services
             {
                 try
                 {
-                    Regex rgx = new Regex("[^a-zA-Z0-9 -]");
                     foreach (var filePath in filePaths)
                     {
-                        using (var reader = new StreamReader(filePath))
+                        try
                         {
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
+                            using (var reader = new StreamReader(filePath))
                             {
-                                string[] wordsInLine = line.Split(' ');
-                                foreach (var singleWord in wordsInLine)
+                                string line;
+                                while ((line = reader.ReadLine()) != null)
                                 {
-                                    //remove non alphanumeric chars
-                                    string cleanWord = rgx.Replace(singleWord, "");
-                                    // Hand over to addWordsToWordCounter and continue reading.
-                                    words.Add(cleanWord.ToLower());
+                                    string[] wordsInLine = line.Split(' ');
+                                    foreach (var singleWord in wordsInLine)
+                                    {
+                                        // Hand over to addWordsToWordCounter and continue reading.
+                                        words.Add(singleWord);
+                                    }
+
                                 }
-                                
                             }
+                        }
+                        catch (Exception)
+                        {
+                            continue;
                         }
                     }
                 }
@@ -56,18 +60,12 @@ namespace WordSortingApp.Services
 
             var addWordsToWordCounter = Task.Run(() =>
             {
-                // Process lines on a ThreadPool thread
-                // as soon as they become available.
                 foreach (var word in words.GetConsumingEnumerable())
                 {
-                    // Send to word counter service
                     WordCounterService.AddWordToCollection(word);
                 }
             });
 
-            // Block until both tasks have completed.
-            // This makes this method prone to deadlocking.
-            // Consider using 'await Task.WhenAll' instead.
             Task.WaitAll(readWordsFromFile, addWordsToWordCounter);
         }
     }
