@@ -15,3 +15,6 @@ Build docker image:
 docker build -t word-counter-app .
 docker run -it word-counter-app cmd.exe
 ```
+
+## Application Design
+![alt text](https://github.com/liorbashan/WordSorting/blob/master/Word%20Counter%20App.png?raw=true)
