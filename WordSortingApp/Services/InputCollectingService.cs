@@ -16,41 +16,19 @@ namespace WordSortingApp.Services
             _fileTextCollectorAdapter = fileReader;
             _urlTextCollectorAdapter = urlReader;
         }
-        public void CreateCollectionFromInputs(InputType inputType, string[] sources)
+        public void CreateCollectionFromInputs(string[] files, string[] urls)
         {
-            //switch (inputType)
-            //{
-            //    case InputType.File:
-            //        _fileTextCollectorAdapter = new FileReaderService();
-            //        break;
-            //    case InputType.URL:
-            //        break;
-            //    default:
-            //        break;
-            //}
-            //this._fileTextCollectorAdapter.ReadAndAddToCollection(sources);
-            _urlTextCollectorAdapter.ReadAndAddToCollection(sources);
-
-            bool contineu = true;
-            while (contineu)
+            var collectFromFiles = Task.Run(() =>
             {
-                contineu = ResetUserInterface();
-            }
-        }
+                _fileTextCollectorAdapter.ReadAndAddToCollection(files);
+            });
+            var collectFromUrls = Task.Run(() =>
+            {
+                _urlTextCollectorAdapter.ReadAndAddToCollection(urls);
 
-        public bool ResetUserInterface()
-        {
-            Console.WriteLine("Type a word and get the amount of instances it apears in text");
-            string word = Console.ReadLine();
-            int count = WordCounterService.GetNumberOfIsntances(word);
-            Console.WriteLine($"The word {word} apears in text {count} times");
+            });
 
-            Console.WriteLine("Continue? Y/N");
-            string userInput = Console.ReadLine();
-            if (userInput.ToLower() == "y")
-                return true;
-            else
-                return false;
+            Task.WaitAll(collectFromFiles, collectFromUrls);
         }
     }
 }
