@@ -112,6 +112,11 @@ namespace WordSortingApp
 
         public void ShowResults()
         {
+            foreach (var item in WordCounterService.wordsTable)
+            {
+                Console.WriteLine($"{item.Key}: {item.Value}");
+            }
+            Console.WriteLine("________________________________________________________________");
             bool checkResult = true;
             while(checkResult)
             {
