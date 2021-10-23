@@ -13,7 +13,7 @@ Build docker image:
 
 ```sh
 docker build -t word-counter-app .
-docker run -it word-counter-app cmd.exe
+docker run -it word-counter-app bin/bash    (or cmd.exe)
 ```
 
 ## Application Design
