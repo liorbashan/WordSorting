@@ -115,18 +115,22 @@ namespace WordSortingApp
             bool checkResult = true;
             while(checkResult)
             {
-                Console.WriteLine("Type a word and see how many itme it apears in input. (Press ESC to exit)");
-                var key = Console.ReadKey();
-                if(key.Key == ConsoleKey.Escape)
+                Console.WriteLine("Type a word and see how many itme it apears in input.");
+                string word = Console.ReadLine();
+                if(!String.IsNullOrEmpty(word))
                 {
-                    checkResult = false;
-                    break;
+                    int count = WordCounterService.GetNumberOfIsntances(word);
+                    Console.WriteLine($"The word {word} apears in text {count} times\n\n");
                 }
                 else
                 {
-                    string word = Console.ReadLine();
-                    int count = WordCounterService.GetNumberOfIsntances(word);
-                    Console.WriteLine($"The word {word} apears in text {count} times\n\n");
+                    Console.WriteLine("Press ESC to exit");
+                    var key = Console.ReadKey();
+                    if (key.Key == ConsoleKey.Escape)
+                    {
+                        checkResult = false;
+                        break;
+                    }
                 }
             }
             
